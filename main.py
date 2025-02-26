@@ -1,17 +1,18 @@
 import sys
 import sqlite3
-from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QDialog
 from PyQt6.QtGui import QIntValidator, QDoubleValidator
+from UI.main_window_ui import Ui_MainWindow
+from UI.add_edit_coffee_form_ui import Ui_AddEditCoffeeForm
 
 
-class AddEditCoffeeForm(QDialog):
+class AddEditCoffeeForm(QDialog, Ui_AddEditCoffeeForm):
     def __init__(self, parent=None, coffee_id=None):
         super().__init__(parent)
-        uic.loadUi('addEditCoffeeForm.ui', self)
+        self.setupUi(self)
         self.setWindowTitle("Add/Edit Coffee")
         self.coffee_id = coffee_id
-        self.conn = sqlite3.connect('coffee.sqlite')
+        self.conn = sqlite3.connect('data/coffee.sqlite')
         self.cursor = self.conn.cursor()
 
         # Validators for numeric input
@@ -69,23 +70,23 @@ class AddEditCoffeeForm(QDialog):
         self.close()
 
 
-class CoffeeViewer(QMainWindow):
+class CoffeeViewer(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('main.ui', self)  # Загружаем UI
+        self.setupUi(self)
         self.load_data()
 
         self.addButton.clicked.connect(self.add_coffee)
         self.editButton.clicked.connect(self.edit_coffee)
 
     def load_data(self):
-        conn = sqlite3.connect('coffee.sqlite')
+        conn = sqlite3.connect('data/coffee.sqlite')
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM coffee")
         data = cursor.fetchall()
 
-        self.tableWidget.setRowCount(0)  # Очищаем таблицу
+        self.tableWidget.setRowCount(0)
         for row_num, row_data in enumerate(data):
             self.tableWidget.insertRow(row_num)
             for col_num, col_data in enumerate(row_data):
